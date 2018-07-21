@@ -8,14 +8,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
-import { FormattedNumber } from 'react-intl';
 
 import { makeSelectCurrentUser } from 'containers/App/selectors';
 import ListItem from 'components/ListItem';
+/* eslint-disable import/no-unresolved */
 import Tag from 'components/Tag';
-import IssueIcon from './IssueIcon';
+import Img from './Img';
 import IssueLink from './IssueLink';
 import RepoLink from './RepoLink';
+import TagsList from './TagsList';
 import Wrapper from './Wrapper';
 
 export class RepoListItem extends React.PureComponent {
@@ -30,29 +31,28 @@ export class RepoListItem extends React.PureComponent {
     return arrTags;
   };
 
+  renderAvatars = arr =>
+    arr.map(
+      (elem, idx) =>
+        idx < 3 ? (
+          <IssueLink key={elem.id} href={`${elem.html_url}`} target="_blank">
+            <Img src={elem.owner.avatar_url} alt="avatar" />
+          </IssueLink>
+        ) : null,
+    );
+
   render() {
     const { item } = this.props;
-    console.log('item', item);
     const tags = this.getTags(item.files);
-    const nameprefix = `${item.owner.login}/`;
+    const nameprefix = `${item.owner.login}`;
 
-    // If the repository is owned by a different person than we got the data for
-    // it's a fork and we should show the name of the owner
-    // if (item.owner.login !== this.props.currentUser) {
-    //   nameprefix = `${item.owner.login}/`;
-    // }
-
-    // Put together the content of the repository
     const content = (
       <Wrapper>
         <RepoLink href={item.html_url} target="_blank">
           {nameprefix}
         </RepoLink>
-        {tags}
-        <IssueLink href={`${item.html_url}/issues`} target="_blank">
-          <IssueIcon />
-          {/* <FormattedNumber value={item.open_issues_count} /> */}
-        </IssueLink>
+        <TagsList>{tags}</TagsList>
+        {item.forks.length ? this.renderAvatars(item.forks) : <div />}
       </Wrapper>
     );
 
@@ -63,7 +63,6 @@ export class RepoListItem extends React.PureComponent {
 
 RepoListItem.propTypes = {
   item: PropTypes.object,
-  currentUser: PropTypes.string,
 };
 
 export default connect(

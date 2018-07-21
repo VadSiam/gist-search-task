@@ -32,7 +32,7 @@ import { loadRepos } from '../App/actions';
 import { changeUsername } from './actions';
 import { makeSelectUsername } from './selectors';
 import reducer from './reducer';
-import saga from './saga';
+import { githubData, forkData } from './saga';
 
 /* eslint-disable react/prefer-stateless-function */
 export class HomePage extends React.PureComponent {
@@ -58,8 +58,9 @@ export class HomePage extends React.PureComponent {
         <Helmet>
           <title>Home Page</title>
           <meta
+            /* eslint-disable prettier/prettier */
             name="description"
-            content="A React.js Boilerplate application homepage"
+            content="A React.js application homepage"
           />
         </Helmet>
         <div>
@@ -131,10 +132,12 @@ const withConnect = connect(
 );
 
 const withReducer = injectReducer({ key: 'home', reducer });
-const withSaga = injectSaga({ key: 'home', saga });
+const withSaga = injectSaga({ key: 'home', saga: githubData });
+const withSagaTwo = injectSaga({ key: 'forks', saga: forkData });
 
 export default compose(
   withReducer,
   withSaga,
+  withSagaTwo,
   withConnect,
 )(HomePage);
